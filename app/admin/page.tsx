@@ -22,6 +22,7 @@ export default function AdminPage() {
         setLoading(false);
       })
       .catch((err) => {
+        console.error("~ err:", err);
         setError("Failed to load links");
         setLoading(false);
       });
