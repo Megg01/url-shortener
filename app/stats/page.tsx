@@ -9,13 +9,13 @@ interface ShortLink {
   clicks: number;
 }
 
-export default function AdminPage() {
+export default function StatsPage() {
   const [links, setLinks] = useState<ShortLink[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/links")
+    fetch("/api/stats")
       .then((res) => res.json())
       .then((data) => {
         setLinks(data.links);
@@ -58,7 +58,6 @@ export default function AdminPage() {
                     {link.longUrl}
                   </a>
                 </td>
-                <td className="px-6 py-4 border-b">{link.clicks}</td>
                 <td className="px-6 py-4 border-b">
                   {new Date(link.createdAt).toLocaleString()}
                 </td>

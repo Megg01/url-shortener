@@ -4,14 +4,20 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 export async function GET(
-  request: Request
+  request: Request,
+  context: { params: { shortCode: string } }
 ) {
   try {
-    const url = new URL(request.url)
-    const shortCode = url.pathname.split('/')[2]
+    const params = await context.params
+    const shortCode = params.shortCode
 
-    const shortLink = await prisma.shortLink.findUnique({
-      where: { shortCode }
+    const shortLink = await prisma.shortLink.update({
+      where: { shortCode },
+      data: {
+        clicks: {
+          increment: 1,
+        }
+      }
     })
 
     if (!shortLink) {
