@@ -26,7 +26,7 @@ export default function UrlShortenerForm() {
         setError(data.error);
       }
     } catch (err) {
-      setError("Failed to shorten URL");
+      setError("Failed to shorten URL:" + JSON.stringify(err));
     }
   };
 

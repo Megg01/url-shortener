@@ -21,7 +21,7 @@ export async function POST(request: Request) {
   const shortCode = nanoid(6)
   
   try {
-    const shortLink = await prisma.shortLink.create({
+    await prisma.shortLink.create({
       data: {
         longUrl: body.url,
         shortCode
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     
     const origin = request.headers.get('origin') || ''
     return NextResponse.json({ 
-      shortUrl: `${origin}/${shortCode}` 
+      shortUrl: `${origin}/${shortCode}`
     })
   } catch (error) {
     console.error(error)
