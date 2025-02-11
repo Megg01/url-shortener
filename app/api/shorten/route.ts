@@ -5,7 +5,8 @@ import { nanoid } from 'nanoid'
 const prisma = new PrismaClient()
 
 interface RequestBody {
-  url: string
+  url: string,
+  expiresAt: Date | null,
 }
 
 export async function POST(request: Request) {
@@ -24,6 +25,7 @@ export async function POST(request: Request) {
     await prisma.shortLink.create({
       data: {
         longUrl: body.url,
+        expiresAt: body.expiresAt || null,
         shortCode
       }
     })

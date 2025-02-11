@@ -4,27 +4,33 @@ import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Button } from "./ui/button";
 
 interface ChooseDaysProps {
+  value?: string;
   defaultValue?: string;
   options: { label: string; value: string }[];
   onValueChange?: (value: string) => void;
 }
 
 export default function ChooseDays({
+  value,
   defaultValue,
   options,
   onValueChange,
 }: ChooseDaysProps) {
+  const selectedOption = options.find((opt) => opt.value === value);
+  const defaultOption = options.find((opt) => opt.value === defaultValue);
+  const displayLabel = selectedOption?.label || defaultOption?.label || "";
+
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="text-slate-500">
-          {defaultValue}
+        <Button variant="outline" className="text-slate-500 min-w-24">
+          {displayLabel}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-fit">
         <RadioGroup
           onValueChange={onValueChange}
-          defaultValue={defaultValue}
+          defaultValue={value}
           className="flex flex-col justify-between flex-wrap gap-2"
         >
           {options.map((option) => (

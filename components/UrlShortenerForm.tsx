@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ClipboardCopy } from "@/utils";
 import QRCode from "react-qr-code";
+import dayjs from "dayjs";
 import { Copy, QrCodeIcon } from "lucide-react";
 import ChooseSize from "./ChooseSize";
 import { useToast } from "@/hooks/use-toast";
@@ -28,10 +29,10 @@ const QR_OPTIONS = [
   { label: "SVG", value: "svg" },
 ];
 const DAY_OPTIONS = [
-  { label: "1 day", value: "1 day" },
-  { label: "3 days", value: "3 days" },
-  { label: "7 days", value: "7 days" },
-  { label: "30 days", value: "30 days" },
+  { label: "1 day", value: "1" },
+  { label: "3 days", value: "3" },
+  { label: "7 days", value: "7" },
+  { label: "30 days", value: "30" },
   { label: "Lifetime", value: "lifetime" },
 ];
 
@@ -41,7 +42,9 @@ export default function UrlShortenerForm() {
   const [shortUrl, setShortUrl] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [qrSize, setQrSize] = useState<number>(64);
-  const [days, setDays] = useState<number>(64);
+  const [selectedDays, setSelectedDays] = useState<string>(
+    DAY_OPTIONS[0].value,
+  );
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -50,7 +53,13 @@ export default function UrlShortenerForm() {
       const response = await fetch("/api/shorten", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url }),
+        body: JSON.stringify({
+          url,
+          expiresAt:
+            selectedDays === "lifetime"
+              ? null
+              : dayjs().add(parseInt(selectedDays), "day"),
+        }),
       });
 
       const data = await response.json();
@@ -73,16 +82,11 @@ export default function UrlShortenerForm() {
     }
   };
 
-  const onChangeDays = (value: string) => {
-    setDays(parseInt(value.slice(0, -2), 10));
-  };
-
   const handleClickCopy = () => {
     ClipboardCopy(shortUrl);
     toast({
       description: "You can now paste it in your browser",
       duration: 1000,
-      color: "#434",
     });
   };
 
@@ -109,7 +113,8 @@ export default function UrlShortenerForm() {
             required
           />
           <ChooseDays
-            onValueChange={onChangeDays}
+            value={selectedDays}
+            onValueChange={setSelectedDays}
             defaultValue={DAY_OPTIONS[0].value}
             options={DAY_OPTIONS}
           />

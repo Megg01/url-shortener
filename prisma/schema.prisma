@@ -8,9 +8,12 @@ datasource db {
 }
 
 model ShortLink {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   longUrl   String
-  shortCode String   @unique
-  createdAt DateTime @default(now())
-  clicks    Int      @default(0)
+  shortCode String    @unique
+  clicks    Int       @default(0)
+  createdAt DateTime  @default(now())
+  expiresAt DateTime?
+
+  @@index([expiresAt])
 }
