@@ -74,7 +74,7 @@ export default function UrlShortenerForm() {
   };
 
   const onChangeDays = (value: string) => {
-    setQrSize(parseInt(value.slice(0, -2), 10));
+    setDays(parseInt(value.slice(0, -2), 10));
   };
 
   const handleClickCopy = () => {
