@@ -1,38 +1,34 @@
-import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import { NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 export async function GET(
   request: Request,
-  context: { params: { shortCode: string } }
+  { params }: { params: Promise<{ shortCode: string }> },
 ) {
   try {
-    const params = await context.params
-    const shortCode = params.shortCode
+    const shortCode = (await params).shortCode;
 
     const shortLink = await prisma.shortLink.update({
       where: { shortCode },
       data: {
         clicks: {
           increment: 1,
-        }
-      }
-    })
+        },
+      },
+    });
 
     if (!shortLink) {
       return NextResponse.json(
-        { error: 'Short link not found' },
-        { status: 404 }
-      )
+        { error: "Short link not found" },
+        { status: 404 },
+      );
     }
 
-    return NextResponse.redirect(shortLink.longUrl)
+    return NextResponse.redirect(shortLink.longUrl);
   } catch (error) {
-    console.error("🚀 ~ error:", error)
-    return NextResponse.json(
-      { error: 'Server error' },
-      { status: 500 }
-    )
+    console.error("🚀 ~ error:", error);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
