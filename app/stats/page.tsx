@@ -5,17 +5,18 @@ interface ShortLink {
   id: string;
   shortCode: string;
   longUrl: string;
-  createdAt: string;
   clicks: number;
+  createdAt: string;
+  expiresAt: string;
 }
 
-export default function StatsPage() {
+export default function AdminPage() {
   const [links, setLinks] = useState<ShortLink[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/stats")
+    fetch("/api/links")
       .then((res) => res.json())
       .then((data) => {
         setLinks(data.links);
@@ -42,6 +43,7 @@ export default function StatsPage() {
               <th className="px-6 py-3 border-b">Long URL</th>
               <th className="px-6 py-3 border-b">Clicks</th>
               <th className="px-6 py-3 border-b">Created At</th>
+              <th className="px-6 py-3 border-b">Expires At</th>
             </tr>
           </thead>
           <tbody>
@@ -58,8 +60,12 @@ export default function StatsPage() {
                     {link.longUrl}
                   </a>
                 </td>
+                <td className="px-6 py-4 border-b">{link.clicks}</td>
                 <td className="px-6 py-4 border-b">
                   {new Date(link.createdAt).toLocaleString()}
+                </td>
+                <td className="px-6 py-4 border-b">
+                  {new Date(link.expiresAt).toLocaleString()}
                 </td>
               </tr>
             ))}
