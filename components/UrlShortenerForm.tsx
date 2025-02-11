@@ -1,12 +1,47 @@
 "use client";
 
-import { ClipboardCopy } from "@/utils";
 import { useState, FormEvent, ChangeEvent } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { ClipboardCopy } from "@/utils";
+import QRCode from "react-qr-code";
+import { Copy, QrCodeIcon } from "lucide-react";
+import ChooseSize from "./ChooseSize";
+import { useToast } from "@/hooks/use-toast";
+import { ShineBorder } from "./magicui/shine-border";
+import { Input } from "./ui/input";
+import ChooseDays from "./ChooseDays";
+
+const QR_OPTIONS = [
+  { label: "64px", value: "64px" },
+  { label: "128px", value: "128px" },
+  { label: "256px", value: "256px" },
+  { label: "512px", value: "512px" },
+  { label: "SVG", value: "svg" },
+];
+const DAY_OPTIONS = [
+  { label: "1 day", value: "1 day" },
+  { label: "3 days", value: "3 days" },
+  { label: "7 days", value: "7 days" },
+  { label: "30 days", value: "30 days" },
+  { label: "Lifetime", value: "lifetime" },
+];
 
 export default function UrlShortenerForm() {
+  const { toast } = useToast();
   const [url, setUrl] = useState<string>("");
   const [shortUrl, setShortUrl] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const [qrSize, setQrSize] = useState<number>(64);
+  const [days, setDays] = useState<number>(64);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -31,51 +66,115 @@ export default function UrlShortenerForm() {
     }
   };
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const onChangeQrSize = (value: string) => {
+    if (value === "svg") {
+    } else {
+      setQrSize(parseInt(value.slice(0, -2), 10));
+    }
+  };
+
+  const onChangeDays = (value: string) => {
+    setQrSize(parseInt(value.slice(0, -2), 10));
+  };
+
+  const handleClickCopy = () => {
+    ClipboardCopy(shortUrl);
+    toast({
+      description: "You can now paste it in your browser",
+      duration: 1000,
+      color: "#434",
+    });
+  };
+
+  const handleChangeUrl = (e: ChangeEvent<HTMLInputElement>) => {
     setUrl(e.target.value);
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow-md">
-      <form onSubmit={handleSubmit}>
-        <input
-          type="url"
-          value={url}
-          onChange={handleChange}
-          placeholder="Enter your URL"
-          className="w-full p-2 mb-4 border rounded text-gray-600"
-          required
-        />
-        <button
+    <ShineBorder
+      className="max-w-2xl mx-auto mt-10 md:p-6 bg-white rounded shadow-md"
+      duration={8}
+    >
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col md:flex-row items-center md:items-start w-full max-w-3xl md:space-x-2"
+      >
+        <div className="flex space-x-1">
+          <Input
+            type="url"
+            value={url}
+            onChange={handleChangeUrl}
+            placeholder="Enter your URL"
+            className="w-full md:min-w-80 min-w-64 p-2 mb-2 md:mb-4 border rounded text-gray-600"
+            required
+          />
+          <ChooseDays
+            onValueChange={onChangeDays}
+            defaultValue={DAY_OPTIONS[0].value}
+            options={DAY_OPTIONS}
+          />
+        </div>
+        <Button
           type="submit"
-          className="w-full bg-primarybutton text-foreground font-semibold p-2 rounded hover:bg-primarybuttonhover"
+          className="w-full bg-foreground text-background font-semibold rounded hover:bg-neutral-800"
         >
           Shorten
-        </button>
+        </Button>
       </form>
 
       {error && <p className="mt-4 text-red-500">{error}</p>}
 
-      {shortUrl && (
-        <div className="flex justify-between items-center mt-4 p-4 bg-gray-100 rounded">
-          <p className="text-gray-700">
-            Short URL:
-            <a href={shortUrl} className="text-blue-500 ml-2">
-              {shortUrl}
-            </a>
-          </p>
-          <button type="button" onClick={() => ClipboardCopy(shortUrl)}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              height="20"
-              width="20"
-              viewBox="0 0 448 512"
-            >
-              <path d="M384 336l-192 0c-8.8 0-16-7.2-16-16l0-256c0-8.8 7.2-16 16-16l140.1 0L400 115.9 400 320c0 8.8-7.2 16-16 16zM192 384l192 0c35.3 0 64-28.7 64-64l0-204.1c0-12.7-5.1-24.9-14.1-33.9L366.1 14.1c-9-9-21.2-14.1-33.9-14.1L192 0c-35.3 0-64 28.7-64 64l0 256c0 35.3 28.7 64 64 64zM64 128c-35.3 0-64 28.7-64 64L0 448c0 35.3 28.7 64 64 64l192 0c35.3 0 64-28.7 64-64l0-32-48 0 0 32c0 8.8-7.2 16-16 16L64 464c-8.8 0-16-7.2-16-16l0-256c0-8.8 7.2-16 16-16l32 0 0-48-32 0z" />
-            </svg>
-          </button>
+      {(shortUrl || true) && (
+        <div className="w-full flex justify-between items-center mt-4 py-2 px-3 bg-gray-200 rounded">
+          <a href={shortUrl} className="text-blue-500 ml-2">
+            {shortUrl}
+          </a>
+          <div className="flex flex-nowrap">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <QrCodeIcon />
+                </Button>
+              </DialogTrigger>
+              <DialogDescription />
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>QR</DialogTitle>
+                </DialogHeader>
+                <div
+                  style={{
+                    height: "auto",
+                    margin: "0 auto",
+                    maxWidth: qrSize,
+                    width: "100%",
+                  }}
+                >
+                  <QRCode
+                    size={512}
+                    style={{
+                      height: "auto",
+                      maxWidth: "100%",
+                      width: "100%",
+                    }}
+                    value={shortUrl}
+                    viewBox={`0 0 512 512`}
+                  />
+                </div>
+                <DialogFooter className="sm:justify-start">
+                  <ChooseSize
+                    onValueChange={onChangeQrSize}
+                    defaultValue={QR_OPTIONS[0].value}
+                    options={QR_OPTIONS}
+                  />
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+            <Button variant="ghost" size="icon" onClick={handleClickCopy}>
+              <Copy />
+            </Button>
+          </div>
         </div>
       )}
-    </div>
+    </ShineBorder>
   );
 }

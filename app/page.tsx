@@ -1,12 +1,13 @@
+import { HyperText } from "@/components/magicui/hyper-text";
 import UrlShortenerForm from "@/components/UrlShortenerForm";
 
 export default function Home() {
   return (
     <div>
       <main className="container mx-auto px-4">
-        <h1 className="text-4xl text-foreground font-bold text-center mt-20 mb-8">
+        <HyperText className="text-foreground text-center mt-4">
           URL Shortener
-        </h1>
+        </HyperText>
         <UrlShortenerForm />
       </main>
     </div>
