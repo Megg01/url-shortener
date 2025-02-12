@@ -28,7 +28,11 @@ export async function GET(
 
     return NextResponse.redirect(shortLink.longUrl);
   } catch (error) {
-    console.error("🚀 ~ error:", error);
+    if (error instanceof Error) {
+      console.error("🚀 ~ error:", error);
+    } else {
+      console.error("��� ~ error:", error);
+    }
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

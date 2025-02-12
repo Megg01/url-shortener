@@ -83,6 +83,9 @@ Prisma.NullTypes = {
  * Enums
  */
 exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
+  ReadUncommitted: 'ReadUncommitted',
+  ReadCommitted: 'ReadCommitted',
+  RepeatableRead: 'RepeatableRead',
   Serializable: 'Serializable'
 });
 
@@ -98,6 +101,11 @@ exports.Prisma.ShortLinkScalarFieldEnum = {
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
 };
 
 exports.Prisma.NullsOrder = {
@@ -138,7 +146,8 @@ const config = {
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": null
+    "rootEnvPath": null,
+    "schemaEnvPath": "../../../.env"
   },
   "relativePath": "../..",
   "clientVersion": "6.3.1",
@@ -146,18 +155,18 @@ const config = {
   "datasourceNames": [
     "db"
   ],
-  "activeProvider": "sqlite",
-  "postinstall": true,
+  "activeProvider": "postgresql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
-        "fromEnvVar": null,
-        "value": "file:./dev.db"
+        "fromEnvVar": "DATABASE_URL",
+        "value": null
       }
     }
   },
-  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"./generated/client\"\n}\n\ndatasource db {\n  provider = \"sqlite\"\n  url      = \"file:./dev.db\"\n}\n\nmodel ShortLink {\n  id        String    @id @default(cuid())\n  longUrl   String\n  shortCode String    @unique\n  clicks    Int       @default(0)\n  createdAt DateTime  @default(now())\n  expiresAt DateTime?\n\n  @@index([expiresAt])\n}\n",
-  "inlineSchemaHash": "53ac8b5935995467b72f57243f5a732679557aea994d14e324dcaf410632c2d4",
+  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"./generated/client\"\n}\n\ndatasource db {\n  provider  = \"postgresql\"\n  url       = env(\"DATABASE_URL\")\n  directUrl = env(\"DIRECT_URL\")\n}\n\nmodel ShortLink {\n  id        String    @id @default(cuid())\n  longUrl   String\n  shortCode String    @unique\n  clicks    Int       @default(0)\n  createdAt DateTime  @default(now())\n  expiresAt DateTime?\n\n  @@index([expiresAt])\n}\n",
+  "inlineSchemaHash": "5d5f841d85c1bbe2f8046d9f114952d7884ffcf5e674c48a08f7889d7160da15",
   "copyEngine": true
 }
 config.dirname = '/'
@@ -168,7 +177,9 @@ config.engineWasm = undefined
 config.compilerWasm = undefined
 
 config.injectableEdgeEnv = () => ({
-  parsed: {}
+  parsed: {
+    DATABASE_URL: typeof globalThis !== 'undefined' && globalThis['DATABASE_URL'] || typeof process !== 'undefined' && process.env && process.env.DATABASE_URL || undefined
+  }
 })
 
 if (typeof globalThis !== 'undefined' && globalThis['DEBUG'] || typeof process !== 'undefined' && process.env && process.env.DEBUG || undefined) {
