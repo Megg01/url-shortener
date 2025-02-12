@@ -17,7 +17,7 @@ async function deleteExpiredLinks() {
 }
 
 // Schedule the task to run every hour
-cron.schedule("0 * * * *", () => {
+cron.schedule("0 0 * * *", () => {
   console.log("Running expired links cleanup...");
   deleteExpiredLinks().catch((e) => console.error(e));
 });
