@@ -19,16 +19,13 @@ export async function POST(request: Request) {
   const shortCode = nanoid(6);
 
   try {
-    const links = await prisma.$queryRaw`SELECT * FROM "public"."ShortLink"`;
-    console.log(links);
-
-    // await prisma.shortLink.create({
-    //   data: {
-    //     longUrl: body.url,
-    //     expiresAt: body.expiresAt || null,
-    //     shortCode,
-    //   },
-    // });
+    await prisma.shortLink.create({
+      data: {
+        longUrl: body.url,
+        expiresAt: body.expiresAt || null,
+        shortCode,
+      },
+    });
 
     const origin = request.headers.get("origin") || "";
     return NextResponse.json({
