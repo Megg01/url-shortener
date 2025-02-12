@@ -129,7 +129,7 @@ export default function UrlShortenerForm() {
 
       {error && <p className="mt-4 text-red-500">{error}</p>}
 
-      {(shortUrl || true) && (
+      {shortUrl && (
         <div className="w-full flex justify-between items-center mt-4 py-2 px-3 bg-gray-200 rounded">
           <a href={shortUrl} className="text-blue-500 ml-2">
             {shortUrl}
